@@ -1,8 +1,8 @@
-import React from 'react'
 import { useAtom } from 'jotai'
 import { entriesAtom, currentPathAtom, selectedIndexAtom } from '../state/atoms'
+import type { FsNode } from '../fs/types'
 
-function padRight(s, w) {
+function padRight(s: string, w: number): string {
   const str = String(s)
   if (str.length >= w) return str.slice(0, w)
   return str + ' '.repeat(w - str.length)
@@ -15,7 +15,7 @@ export default function FilePanel() {
 
   const pathStr = '/' + currentPath.join('/')
 
-  function openEntry(entry) {
+  function openEntry(entry: FsNode) {
     if (entry.name === '..') {
       setCurrentPath((p) => p.slice(0, -1))
       setSelectedIndex(0)

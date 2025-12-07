@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useAtom } from 'jotai'
 import { RetroScreen } from './components/RetroScreen'
 import FilePanel from './components/FilePanel'
@@ -9,7 +9,7 @@ export default function App() {
   const [selectedIndex, setSelectedIndex] = useAtom(selectedIndexAtom)
 
   useEffect(() => {
-    function onKey(e) {
+    function onKey(e: KeyboardEvent) {
       if (e.key === 'ArrowDown') {
         setSelectedIndex((i) => Math.min(i + 1, entries.length - 1))
       } else if (e.key === 'ArrowUp') {
@@ -19,7 +19,7 @@ export default function App() {
         // simulate click by dispatching a custom event that FilePanel could listen for
         // simpler: rely on default click handler by focusing and pressing enter isn't implemented yet
         // just log for now
-        console.log('Enter pressed on', el && el.name)
+        console.log('Enter pressed on', el?.name)
       }
     }
 
