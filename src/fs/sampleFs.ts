@@ -1,4 +1,6 @@
-export const sampleFs = {
+import type { FileSystem } from './types'
+
+export const sampleFs: FileSystem = {
   name: '/',
   type: 'dir',
   children: [
