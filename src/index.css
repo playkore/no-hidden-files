@@ -22,3 +22,32 @@ body {
 }
 h1 { margin: 0 0 0.5rem 0; }
 p { margin: 0; opacity: 0.9 }
+
+/* Retro screen styles */
+.retro-screen { 
+  width: 40ch;
+  /* approximate 25 lines: line-height 1.1 * 25 ~ 27.5ch height; using em-based height is tricky, so let pre control it */
+  background: #001b33;
+  color: #00d7ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Courier New', monospace;
+  padding: 12px;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+}
+.retro-screen .screen {
+  margin: 0;
+  white-space: pre;
+  font-size: 14px;
+  line-height: 1.05;
+  overflow: hidden;
+}
+
+.file-panel { text-align: left }
+.file-panel .panel-header { color: #99f6ff; margin-bottom: 4px }
+.file-panel .panel-sep { color: #004b5a; margin-bottom: 6px }
+.file-panel .list { display: flex; flex-direction: column }
+.file-panel .row { height: 1.1em; padding: 2px 4px; display: flex; gap: 6px; align-items: center }
+.file-panel .row.selected { background: rgba(0,215,255,0.08); color: #ffffff }
+.file-panel .cursor { width: 1ch }
+.file-panel .name { font-family: inherit }
+
