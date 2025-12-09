@@ -82,6 +82,7 @@ src/
 ## TypeScript
 
 The project uses strict TypeScript configuration with:
+
 - Strict type checking enabled
 - No implicit any
 - Unused locals and parameters detection
@@ -97,6 +98,10 @@ Tests are written using Vitest and React Testing Library. Run tests with:
 npm test
 ```
 
+## Progressive Web App
+
+The game ships as an installable PWA. The build output contains a generated service worker and `manifest.webmanifest` (via [`vite-plugin-pwa`](https://github.com/vite-pwa/vite-plugin-pwa)) which precache the core shell and static assets. Updated builds trigger an auto-update of the service worker, and users can install the app from modern browsers or run it offline.
+
 ## Building
 
 Build the project for production:
@@ -110,6 +115,7 @@ The output will be in the `dist/` directory.
 ## CI/CD
 
 The project includes GitHub Actions workflow that runs on every push and pull request:
+
 - Type checking
 - Linting
 - Tests
