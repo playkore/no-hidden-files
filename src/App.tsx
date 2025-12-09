@@ -1,12 +1,10 @@
 import { useEffect } from 'react'
-import { useAtom } from 'jotai'
 import { RetroScreen } from './components/RetroScreen'
 import FilePanel from './components/FilePanel'
-import { entriesAtom, selectedIndexAtom } from './state/atoms'
+import { useFileSystem } from './hooks/useFileSystem'
 
 export default function App() {
-  const [entries] = useAtom(entriesAtom)
-  const [selectedIndex, setSelectedIndex] = useAtom(selectedIndexAtom)
+  const { entries, selectedIndex, setSelectedIndex } = useFileSystem()
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

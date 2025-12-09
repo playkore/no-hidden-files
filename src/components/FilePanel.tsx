@@ -1,5 +1,4 @@
-import { useAtom } from 'jotai'
-import { entriesAtom, currentPathAtom, selectedIndexAtom } from '../state/atoms'
+import { useFileSystem } from '../hooks/useFileSystem'
 import type { FsNode } from '../fs/types'
 
 function padRight(s: string, w: number): string {
@@ -9,19 +8,15 @@ function padRight(s: string, w: number): string {
 }
 
 export default function FilePanel() {
-  const [entries] = useAtom(entriesAtom)
-  const [currentPath, setCurrentPath] = useAtom(currentPathAtom)
-  const [selectedIndex, setSelectedIndex] = useAtom(selectedIndexAtom)
+  const { entries, currentPath, selectedIndex, setSelectedIndex, goToParent, enterDirectory } = useFileSystem()
 
   const pathStr = '/' + currentPath.join('/')
 
   function openEntry(entry: FsNode) {
     if (entry.name === '..') {
-      setCurrentPath((p) => p.slice(0, -1))
-      setSelectedIndex(0)
+      goToParent()
     } else if (entry.type === 'dir') {
-      setCurrentPath((p) => [...p, entry.name])
-      setSelectedIndex(0)
+      enterDirectory(entry.name)
     } else {
       // file opened - for scaffold just alert
       alert(`Open file: ${entry.name}`)
