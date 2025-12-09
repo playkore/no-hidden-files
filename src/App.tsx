@@ -3,6 +3,9 @@ import type { FsNode } from "./fs/types";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useCommandPrompt } from "./hooks/useCommandPrompt";
 import { formatPath } from "./utils/path";
+import { NcScreen } from "./components/NcScreen";
+import { VirtualKeyboard } from "./components/VirtualKeyboard";
+import styles from "./App.module.css";
 
 const menuItems = ["Left", "File", "Disk", "Cards", "Right"];
 
@@ -87,6 +90,10 @@ export default function App() {
         setSelectedIndex((i) => clampIndex(i + 1));
       } else if (e.key === "ArrowUp") {
         setSelectedIndex((i) => clampIndex(i - 1));
+      } else if (e.key === "ArrowLeft") {
+        goToParent();
+      } else if (e.key === "ArrowRight") {
+        changeDirectory(selectedEntry);
       } else if (e.key === "Enter") {
         changeDirectory(selectedEntry);
       }
@@ -94,7 +101,28 @@ export default function App() {
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [changeDirectory, clampIndex, selectedEntry, setSelectedIndex]);
+  }, [
+    changeDirectory,
+    clampIndex,
+    goToParent,
+    selectedEntry,
+    setSelectedIndex,
+  ]);
+
+  const handleVirtualNavigation = useCallback(
+    (action: "up" | "down" | "left" | "right" | "enter") => {
+      if (action === "up") {
+        setSelectedIndex((i) => clampIndex(i - 1));
+      } else if (action === "down") {
+        setSelectedIndex((i) => clampIndex(i + 1));
+      } else if (action === "left") {
+        goToParent();
+      } else {
+        changeDirectory(selectedEntry);
+      }
+    },
+    [changeDirectory, clampIndex, goToParent, selectedEntry, setSelectedIndex]
+  );
 
   function handleTouch(entry: FsNode, index: number, timeStamp: number) {
     setSelectedIndex(clampIndex(index));
@@ -108,75 +136,23 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      <div className="nc-screen">
-        <div className="menu-bar">
-          {menuItems.map((item) => (
-            <button key={item} type="button" className="menu-item">
-              {item}
-            </button>
-          ))}
-        </div>
-
-        <div className="panel">
-          <div className="panel-header">{currentPathLabel}</div>
-          <div className="panel-cols">
-            <div className="col-name">Name</div>
-            <div className="col-size">Size</div>
-            <div className="col-date">Date</div>
-          </div>
-
-          <div className="file-list">
-            {entries.map((entry, index) => {
-              const isActive = index === safeIndex;
-              const rowClass = [
-                "file-row",
-                isActive ? "active" : "",
-                entry.type === "dir" ? "is-dir" : "",
-              ]
-                .filter(Boolean)
-                .join(" ");
-              return (
-                <button
-                  type="button"
-                  key={`${entry.name}-${index}`}
-                  className={rowClass}
-                  onClick={() => setSelectedIndex(clampIndex(index))}
-                  onDoubleClick={() => changeDirectory(entry)}
-                  onTouchEnd={(event) =>
-                    handleTouch(entry, index, event.timeStamp)
-                  }
-                >
-                  <span className="file-name">{entry.name}</span>
-                  <span className="file-size">{formatSize(entry)}</span>
-                  <span className="file-date">
-                    {formatDateText(entry.date)}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="cmd-prompt">
-          <span className="prompt-text">{promptText}</span>
-          <input
-            type="text"
-            className="cmd-input"
-            value={promptInputValue}
-            readOnly
-          />
-        </div>
-
-        <div className="footer-keys">
-          {footerKeys.map((footerKey) => (
-            <button key={footerKey.key} type="button" className="f-key">
-              <span className="key-num">{footerKey.key}</span>
-              {footerKey.label}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className={styles.app}>
+      <NcScreen
+        menuItems={menuItems}
+        footerKeys={footerKeys}
+        currentPathLabel={currentPathLabel}
+        entries={entries}
+        safeIndex={safeIndex}
+        clampIndex={clampIndex}
+        changeDirectory={changeDirectory}
+        setSelectedIndex={setSelectedIndex}
+        handleTouch={handleTouch}
+        formatSize={formatSize}
+        formatDateText={formatDateText}
+        promptText={promptText}
+        promptInputValue={promptInputValue}
+      />
+      <VirtualKeyboard onNavigate={handleVirtualNavigation} />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import styles from './RetroScreen.module.css'
 
 interface RetroScreenProps {
   children: ReactNode
@@ -6,8 +7,8 @@ interface RetroScreenProps {
 
 export function RetroScreen({ children }: RetroScreenProps) {
   return (
-    <div className="retro-screen">
-      <pre className="screen">{children}</pre>
+    <div className={styles.retroScreen}>
+      <pre className={styles.screen}>{children}</pre>
     </div>
   )
 }
