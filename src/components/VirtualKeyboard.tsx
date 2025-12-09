@@ -1,3 +1,5 @@
+import styles from "./VirtualKeyboard.module.css";
+
 type NavigationAction = "up" | "down" | "left" | "right" | "enter";
 
 interface VirtualKeyboardProps {
@@ -6,11 +8,11 @@ interface VirtualKeyboardProps {
 
 export function VirtualKeyboard({ onNavigate }: VirtualKeyboardProps) {
   return (
-    <div className="virtual-keyboard">
-      <div className="key-pad">
+    <div className={styles.virtualKeyboard}>
+      <div className={styles.keyPad}>
         <button
           type="button"
-          className="key key-up"
+          className={`${styles.key} ${styles.keyUp}`}
           aria-label="Move up"
           onClick={() => onNavigate("up")}
         >
@@ -18,7 +20,7 @@ export function VirtualKeyboard({ onNavigate }: VirtualKeyboardProps) {
         </button>
         <button
           type="button"
-          className="key key-left"
+          className={`${styles.key} ${styles.keyLeft}`}
           aria-label="Go to parent directory"
           onClick={() => onNavigate("left")}
         >
@@ -26,7 +28,7 @@ export function VirtualKeyboard({ onNavigate }: VirtualKeyboardProps) {
         </button>
         <button
           type="button"
-          className="key key-down"
+          className={`${styles.key} ${styles.keyDown}`}
           aria-label="Move down"
           onClick={() => onNavigate("down")}
         >
@@ -34,7 +36,7 @@ export function VirtualKeyboard({ onNavigate }: VirtualKeyboardProps) {
         </button>
         <button
           type="button"
-          className="key key-right"
+          className={`${styles.key} ${styles.keyRight}`}
           aria-label="Enter selection"
           onClick={() => onNavigate("right")}
         >
@@ -42,7 +44,7 @@ export function VirtualKeyboard({ onNavigate }: VirtualKeyboardProps) {
         </button>
         <button
           type="button"
-          className="key key-enter"
+          className={`${styles.key} ${styles.keyEnter}`}
           aria-label="Enter selection"
           onClick={() => onNavigate("enter")}
         >

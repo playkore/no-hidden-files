@@ -1,5 +1,6 @@
 import { useFileSystem } from '../hooks/useFileSystem'
 import type { FsNode } from '../fs/types'
+import styles from './FilePanel.module.css'
 
 function padRight(s: string, w: number): string {
   const str = String(s)
@@ -24,23 +25,23 @@ export default function FilePanel() {
   }
 
   return (
-    <div className="file-panel">
-      <div className="panel-header">PATH: {pathStr}</div>
-      <div className="panel-sep">────────────────────────────────────────────</div>
-      <div className="list">
+    <div className={styles.filePanel}>
+      <div className={styles.panelHeader}>PATH: {pathStr}</div>
+      <div className={styles.panelSep}>────────────────────────────────────────────</div>
+      <div className={styles.list}>
         {entries.map((e, i) => {
           const isSel = i === selectedIndex
           return (
             <div
               key={i}
-              className={isSel ? 'row selected' : 'row'}
+              className={isSel ? `${styles.row} ${styles.selected}` : styles.row}
               onClick={() => {
                 setSelectedIndex(i)
                 openEntry(e)
               }}
             >
-              <span className="cursor">{isSel ? '>' : ' '}</span>
-              <span className="name">{padRight(e.name + (e.type === 'dir' && e.name !== '..' ? '/' : ''), 30)}</span>
+              <span className={styles.cursor}>{isSel ? '>' : ' '}</span>
+              <span className={styles.name}>{padRight(e.name + (e.type === 'dir' && e.name !== '..' ? '/' : ''), 30)}</span>
             </div>
           )
         })}

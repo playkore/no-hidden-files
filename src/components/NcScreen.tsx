@@ -1,5 +1,6 @@
 import type { Dispatch, SetStateAction } from "react";
 import type { FsNode } from "../fs/types";
+import styles from "./NcScreen.module.css";
 
 interface FooterKey {
   key: number;
@@ -38,30 +39,30 @@ export function NcScreen({
   promptInputValue,
 }: NcScreenProps) {
   return (
-    <div className="nc-screen">
-      <div className="menu-bar">
+    <div className={styles.ncScreen}>
+      <div className={styles.menuBar}>
         {menuItems.map((item) => (
-          <button key={item} type="button" className="menu-item">
+          <button key={item} type="button" className={styles.menuItem}>
             {item}
           </button>
         ))}
       </div>
 
-      <div className="panel">
-        <div className="panel-header">{currentPathLabel}</div>
-        <div className="panel-cols">
-          <div className="col-name">Name</div>
-          <div className="col-size">Size</div>
-          <div className="col-date">Date</div>
+      <div className={styles.panel}>
+        <div className={styles.panelHeader}>{currentPathLabel}</div>
+        <div className={styles.panelCols}>
+          <div className={styles.colName}>Name</div>
+          <div className={styles.colSize}>Size</div>
+          <div className={styles.colDate}>Date</div>
         </div>
 
-        <div className="file-list">
+        <div className={styles.fileList}>
           {entries.map((entry, index) => {
             const isActive = index === safeIndex;
             const rowClass = [
-              "file-row",
-              isActive ? "active" : "",
-              entry.type === "dir" ? "is-dir" : "",
+              styles.fileRow,
+              isActive ? styles.active : "",
+              entry.type === "dir" ? styles.isDir : "",
             ]
               .filter(Boolean)
               .join(" ");
@@ -76,29 +77,31 @@ export function NcScreen({
                   handleTouch(entry, index, event.timeStamp)
                 }
               >
-                <span className="file-name">{entry.name}</span>
-                <span className="file-size">{formatSize(entry)}</span>
-                <span className="file-date">{formatDateText(entry.date)}</span>
+                <span className={styles.fileName}>{entry.name}</span>
+                <span className={styles.fileSize}>{formatSize(entry)}</span>
+                <span className={styles.fileDate}>
+                  {formatDateText(entry.date)}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      <div className="cmd-prompt">
-        <span className="prompt-text">{promptText}</span>
+      <div className={styles.cmdPrompt}>
+        <span className={styles.promptText}>{promptText}</span>
         <input
           type="text"
-          className="cmd-input"
+          className={styles.cmdInput}
           value={promptInputValue}
           readOnly
         />
       </div>
 
-      <div className="footer-keys">
+      <div className={styles.footerKeys}>
         {footerKeys.map((footerKey) => (
-          <button key={footerKey.key} type="button" className="f-key">
-            <span className="key-num">{footerKey.key}</span>
+          <button key={footerKey.key} type="button" className={styles.fKey}>
+            <span className={styles.keyNum}>{footerKey.key}</span>
             {footerKey.label}
           </button>
         ))}

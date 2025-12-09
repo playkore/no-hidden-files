@@ -5,6 +5,7 @@ import { useCommandPrompt } from "./hooks/useCommandPrompt";
 import { formatPath } from "./utils/path";
 import { NcScreen } from "./components/NcScreen";
 import { VirtualKeyboard } from "./components/VirtualKeyboard";
+import styles from "./App.module.css";
 
 const menuItems = ["Left", "File", "Disk", "Cards", "Right"];
 
@@ -135,7 +136,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={styles.app}>
       <NcScreen
         menuItems={menuItems}
         footerKeys={footerKeys}

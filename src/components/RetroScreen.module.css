@@ -1,0 +1,13 @@
+.retroScreen {
+  background-color: var(--nc-black);
+  border: 3px solid var(--nc-cyan);
+  padding: 12px;
+  color: var(--nc-cyan);
+}
+
+.screen {
+  margin: 0;
+  font-family: var(--font-stack);
+  font-size: 18px;
+  white-space: pre-wrap;
+}

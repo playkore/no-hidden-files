@@ -1,0 +1,48 @@
+.filePanel {
+  background-color: var(--nc-blue);
+  color: var(--nc-white);
+  border: 2px solid var(--nc-white);
+  padding: 8px;
+  font-family: var(--font-stack);
+}
+
+.panelHeader {
+  text-transform: uppercase;
+  color: var(--nc-cyan);
+  margin-bottom: 4px;
+}
+
+.panelSep {
+  color: var(--nc-white);
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  cursor: pointer;
+  padding: 2px 0;
+}
+
+.row.selected {
+  background-color: var(--nc-cyan);
+  color: var(--nc-black);
+}
+
+.cursor {
+  width: 12px;
+}
+
+.name {
+  flex: 1;
+  white-space: pre;
+}
