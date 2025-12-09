@@ -16,7 +16,8 @@ function resolveEntries(fs: FileSystem, path: FsPath): FsNode[] {
   }
 
   const items = node.children ?? []
-  return [{ name: '..', type: 'dir' }, ...items]
+  const parentEntry: FsNode = { name: '..', type: 'dir', date: node.date }
+  return [parentEntry, ...items]
 }
 
 export function useFileSystem() {
