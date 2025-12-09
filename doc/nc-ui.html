@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Norton Commander Mobile</title>
+    <!-- Import a DOS-style pixel font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --nc-blue: #0000AA;
+            --nc-cyan: #00AAAA;
+            --nc-white: #A8A8A8; /* The classic dim white */
+            --nc-bright-white: #FFFFFF;
+            --nc-black: #000000;
+            --font-stack: 'VT323', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none; /* Prevent text selection like an app */
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--nc-black);
+            font-family: var(--font-stack);
+            font-size: 20px; /* Large enough for mobile reading */
+            overflow: hidden; /* Prevent body scroll, handle inside panels */
+        }
+
+        /* Main Container */
+        .nc-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: var(--nc-blue);
+            color: var(--nc-white);
+            padding: 2px;
+        }
+
+        /* Top Menu Bar */
+        .menu-bar {
+            background-color: var(--nc-cyan);
+            color: var(--nc-black);
+            padding: 0 5px;
+            display: flex;
+            gap: 15px;
+            font-weight: bold;
+            height: 25px;
+            align-items: center;
+        }
+        
+        .menu-item::first-letter {
+            color: var(--nc-bright-white); /* However, on cyan bg black is standard */
+            text-decoration: underline; /* Standard UI hint */
+        }
+
+        /* The File Panel */
+        .panel {
+            flex: 1;
+            border: 3px double var(--nc-white); /* Replicating the double line box */
+            display: flex;
+            flex-direction: column;
+            margin: 2px 0;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background-color: var(--nc-blue);
+            color: var(--nc-cyan);
+            text-align: center;
+            padding: 2px;
+            border-bottom: 1px solid var(--nc-white);
+        }
+
+        .panel-cols {
+            display: flex;
+            background-color: var(--nc-blue);
+            color: var(--nc-cyan); /* Yellow/Cyan typically for headers */
+            padding: 2px 5px;
+            border-bottom: 1px solid var(--nc-white);
+        }
+
+        .col-name { flex: 1; }
+        .col-size { width: 80px; text-align: right; }
+        .col-date { width: 90px; text-align: right; display: none; } /* Hide date on small mobile */
+
+        @media (min-width: 600px) {
+            .col-date { display: block; }
+        }
+
+        /* File List Area */
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--nc-cyan) var(--nc-blue);
+        }
+
+        .file-row {
+            display: flex;
+            padding: 2px 5px;
+            cursor: pointer;
+            height: 30px; /* Touch target size */
+            align-items: center;
+        }
+
+        .file-row:hover {
+             /* Subtle hover for mouse users */
+             background-color: rgba(0, 170, 170, 0.2);
+        }
+
+        /* Active Selection (The Cursor) */
+        .file-row.active {
+            background-color: var(--nc-cyan);
+            color: var(--nc-black);
+            animation: blink-cursor 0s; /* Placeholder if we wanted blinking */
+        }
+
+        .file-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-ext { width: 40px; }
+        .file-size { width: 80px; text-align: right; }
+        .file-date { width: 90px; text-align: right; display: none; }
+
+        @media (min-width: 600px) {
+            .file-date { display: block; }
+        }
+
+        /* Command Line Prompt */
+        .cmd-prompt {
+            display: flex;
+            padding: 2px 5px;
+            background-color: var(--nc-black);
+            color: var(--nc-white);
+            font-size: 18px;
+            align-items: center;
+        }
+
+        .prompt-text {
+            color: var(--nc-white);
+            margin-right: 5px;
+        }
+
+        .cmd-input {
+            background: transparent;
+            border: none;
+            color: var(--nc-white);
+            font-family: var(--font-stack);
+            font-size: 18px;
+            flex: 1;
+            outline: none;
+        }
+
+        /* Bottom Function Keys */
+        .footer-keys {
+            display: flex;
+            background-color: var(--nc-black);
+            padding-top: 2px;
+        }
+
+        .f-key {
+            flex: 1;
+            background-color: var(--nc-cyan);
+            color: var(--nc-black);
+            margin-right: 2px;
+            padding: 8px 2px; /* Taller for touch targets */
+            font-size: 18px;
+            text-align: center;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .f-key:last-child {
+            margin-right: 0;
+        }
+
+        .key-num {
+            font-weight: bold; /* Often shown inversely, but simple bold works here */
+        }
+        
+        /* Directory folder styling */
+        .is-dir {
+            color: var(--nc-bright-white);
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="nc-screen">
+    
+    <!-- Top Menu -->
+    <div class="menu-bar">
+        <div class="menu-item">Left</div>
+        <div class="menu-item">File</div>
+        <div class="menu-item">Disk</div>
+        <div class="menu-item">Cmds</div>
+        <div class="menu-item">Right</div>
+    </div>
+
+    <!-- Main Panel -->
+    <div class="panel">
+        <div class="panel-header">C:\GAMES\DOOM</div>
+        
+        <div class="panel-cols">
+            <div class="col-name">Name</div>
+            <div class="col-size">Size</div>
+            <div class="col-date">Date</div>
+        </div>
+
+        <div class="file-list" id="fileList">
+            <!-- Content Injected via JS or Static -->
+            <div class="file-row is-dir" onclick="selectRow(this)">
+                <div class="file-name">..</div>
+                <div class="file-size">UP-DIR</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+            <div class="file-row active" onclick="selectRow(this)">
+                <div class="file-name">DOOM.EXE</div>
+                <div class="file-size">724,198</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+            <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">DOOM.WAD</div>
+                <div class="file-size">4,234,110</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+            <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">SETUP.EXE</div>
+                <div class="file-size">45,200</div>
+                <div class="file-date">11-20-93</div>
+            </div>
+            <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">README.TXT</div>
+                <div class="file-size">12,404</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+            <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">CONFIG.SYS</div>
+                <div class="file-size">128</div>
+                <div class="file-date">01-01-94</div>
+            </div>
+            <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">AUTOEXEC.BAT</div>
+                <div class="file-size">256</div>
+                <div class="file-date">01-01-94</div>
+            </div>
+             <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">IPXSETUP.EXE</div>
+                <div class="file-size">12,200</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+             <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">SERSETUP.EXE</div>
+                <div class="file-size">14,100</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+             <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">MODEM.STR</div>
+                <div class="file-size">2,048</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+             <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">DM.DAT</div>
+                <div class="file-size">512</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+             <div class="file-row" onclick="selectRow(this)">
+                <div class="file-name">HELP.EXE</div>
+                <div class="file-size">110,400</div>
+                <div class="file-date">12-10-93</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Command Prompt -->
+    <div class="cmd-prompt">
+        <span class="prompt-text">C:\GAMES\DOOM></span>
+        <input type="text" class="cmd-input" value="doom.exe" readonly>
+    </div>
+
+    <!-- Bottom F-Keys -->
+    <div class="footer-keys">
+        <div class="f-key">
+            <span class="key-num">1</span>Help
+        </div>
+        <div class="f-key">
+            <span class="key-num">2</span>User
+        </div>
+        <div class="f-key">
+            <span class="key-num">3</span>View
+        </div>
+        <div class="f-key">
+            <span class="key-num">4</span>Edit
+        </div>
+        <div class="f-key">
+            <span class="key-num">5</span>Copy
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectRow(element) {
+        // Remove active class from all rows
+        const rows = document.querySelectorAll('.file-row');
+        rows.forEach(row => row.classList.remove('active'));
+        
+        // Add active class to clicked row
+        element.classList.add('active');
+
+        // Update pseudo command prompt
+        const fileName = element.querySelector('.file-name').innerText;
+        const input = document.querySelector('.cmd-input');
+        
+        if(fileName === '..') {
+             input.value = "";
+        } else {
+             input.value = fileName.toLowerCase();
+        }
+    }
+</script>
+
+</body>
+</html>
