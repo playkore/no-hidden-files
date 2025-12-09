@@ -29,7 +29,7 @@ function formatDateText(date?: string): string {
   if (!date) return "";
   const parts = date.split("-");
   if (parts.length === 3) {
-    const [year, month, day] = parts;
+    const [year, month, day] = parts as [string, string, string];
     const shortYear = year.slice(-2);
     return `${month.padStart(2, "0")}-${day.padStart(2, "0")}-${shortYear}`;
   }
