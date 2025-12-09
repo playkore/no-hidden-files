@@ -7,6 +7,10 @@ export interface FsNode {
   name: string;
   /** Type of the node: 'file' or 'dir' */
   type: 'file' | 'dir';
+  /** File size in bytes (directories may omit this) */
+  size?: number;
+  /** ISO-like date string used for display */
+  date?: string;
   /** Child nodes if this is a directory */
   children?: FsNode[];
 }
