@@ -92,7 +92,8 @@ export default function App() {
     return currentPathLabel
   }, [currentPathLabel, selectedEntry])
 
-  const selectedFileLabel = selectedEntry?.type === 'file' ? selectedEntry.name.toUpperCase() : ''
+  const selectedFileLabel = selectedEntry?.type === 'file' ? selectedEntry.name : ''
+  const promptText = `${selectedDirLabel}>`
 
   function handleTouch(entry: FsNode, index: number, timeStamp: number) {
     setSelectedIndex(clampIndex(index))
@@ -149,14 +150,8 @@ export default function App() {
         </div>
 
         <div className="cmd-prompt">
-          <div className="cmd-field">
-            <span className="field-label">Dir</span>
-            <span className="field-value">{selectedDirLabel}</span>
-          </div>
-          <div className="cmd-field">
-            <span className="field-label">File</span>
-            <span className="field-value">{selectedFileLabel}</span>
-          </div>
+          <span className="prompt-text">{promptText}</span>
+          <input type="text" className="cmd-input" value={selectedFileLabel} readOnly />
         </div>
 
         <div className="footer-keys">

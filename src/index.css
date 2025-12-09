@@ -217,32 +217,3 @@ button {
   color: var(--nc-bright-white);
   font-weight: bold;
 }
-
-.cmd-field {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-}
-
-.field-label {
-  text-transform: uppercase;
-  color: var(--nc-cyan);
-  min-width: 45px;
-}
-
-.field-value {
-  flex: 1;
-  border-bottom: 1px solid var(--nc-cyan);
-  min-height: 26px;
-  display: flex;
-  align-items: center;
-  text-transform: uppercase;
-}
-
-@media (max-width: 599px) {
-  .cmd-prompt {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
