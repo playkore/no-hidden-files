@@ -17,6 +17,10 @@ function resolveEntries(fs: FileSystem, path: FsPath): FsNode[] {
   }
 
   const items = node.children ?? [];
+  if (path.length === 0) {
+    return items;
+  }
+
   const parentEntry: FsNode = { name: "..", type: "dir", date: node.date };
   return [parentEntry, ...items];
 }
