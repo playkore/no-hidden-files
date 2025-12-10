@@ -152,7 +152,6 @@ export default function App() {
         promptText={promptText}
         promptInputValue={promptInputValue}
       />
-      <VirtualKeyboard onNavigate={handleVirtualNavigation} />
     </div>
   );
 }
