@@ -22,10 +22,6 @@ function resolveEntries(fs: FileSystem, path: FsPath): FsNode[] {
   const node = getNode(fs, path);
 
   const items = node.children ?? [];
-  if (path.length === 0) {
-    return items;
-  }
-
   const parentEntry: FsNode = { name: "..", type: "dir", date: node.date };
   return [parentEntry, ...items];
 }
@@ -48,16 +44,9 @@ export function useFileSystem() {
     }
 
     const parentPath = currentPath.slice(0, -1);
-    const lastSegment = currentPath[currentPath.length - 1];
-    const parentNode = getNode(fs, parentPath);
-    const children = parentNode.children ?? [];
-    const childIndex = children.findIndex((child) => child.name === lastSegment);
-    const offset = parentPath.length === 0 ? 0 : 1;
-    const targetIndex = childIndex >= 0 ? childIndex + offset : 0;
-
     setCurrentPath(parentPath);
-    setSelectedIndex(targetIndex);
-  }, [currentPath, fs, setCurrentPath, setSelectedIndex]);
+    setSelectedIndex(0);
+  }, [currentPath, setCurrentPath, setSelectedIndex]);
 
   const enterDirectory = useCallback(
     (dirName: string) => {

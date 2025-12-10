@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FsNode } from "./fs/types";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useCommandPrompt } from "./hooks/useCommandPrompt";
 import { formatPath } from "./utils/path";
 import { NcScreen } from "./components/NcScreen";
 import { VirtualKeyboard } from "./components/VirtualKeyboard";
+import { QbertGame } from "./components/games/qbert/QbertGame";
 import styles from "./App.module.css";
 
 const menuItems = ["Left", "File", "Disk", "Cards", "Right"];
@@ -53,6 +54,7 @@ export default function App() {
     index: -1,
     time: 0,
   });
+  const [activeExecutable, setActiveExecutable] = useState<"qbert" | null>(null);
   const entriesLength = entries.length;
 
   const clampIndex = useCallback(
@@ -66,13 +68,25 @@ export default function App() {
   const changeDirectory = useCallback(
     (entry?: FsNode) => {
       if (!entry) return;
+      const normalizedPath = currentPath.map((segment) =>
+        segment.toLowerCase()
+      );
+      if (
+        entry.type === "file" &&
+        entry.name.toLowerCase() === "qbert.exe" &&
+        normalizedPath.join("/") === "games/qbert"
+      ) {
+        setActiveExecutable("qbert");
+        return;
+      }
+
       if (entry.name === "..") {
         goToParent();
       } else if (entry.type === "dir") {
         enterDirectory(entry.name);
       }
     },
-    [enterDirectory, goToParent]
+    [currentPath, enterDirectory, goToParent, setActiveExecutable]
   );
 
   const safeIndex = clampIndex(selectedIndex);
@@ -86,6 +100,9 @@ export default function App() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
+      if (activeExecutable) {
+        return;
+      }
       if (e.key === "ArrowDown") {
         setSelectedIndex((i) => clampIndex(i + 1));
       } else if (e.key === "ArrowUp") {
@@ -102,6 +119,7 @@ export default function App() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [
+    activeExecutable,
     changeDirectory,
     clampIndex,
     goToParent,
@@ -152,6 +170,13 @@ export default function App() {
         promptText={promptText}
         promptInputValue={promptInputValue}
       />
+      {activeExecutable === "qbert" && (
+        <div className={styles.overlay}>
+          <div className={styles.gameWindow}>
+            <QbertGame onClose={() => setActiveExecutable(null)} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
