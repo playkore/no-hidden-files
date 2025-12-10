@@ -6,6 +6,8 @@
   background-color: var(--nc-blue);
   color: var(--nc-white);
   padding: 2px;
+  font-size: 2rem;
+  line-height: 1;
 }
 
 .menuBar {
@@ -54,12 +56,12 @@
 }
 
 .colSize {
-  width: 80px;
+  width: 120px;
   text-align: right;
 }
 
 .colDate {
-  width: 90px;
+  width: 120px;
   text-align: right;
   display: block;
 }
@@ -98,12 +100,12 @@
 }
 
 .fileSize {
-  width: 80px;
+  width: 120px;
   text-align: right;
 }
 
 .fileDate {
-  width: 90px;
+  width: 120px;
   text-align: right;
   display: block;
 }
@@ -113,7 +115,7 @@
   padding: 2px 5px;
   background-color: var(--nc-black);
   color: var(--nc-white);
-  font-size: 18px;
+  font-size: 0.9em;
   align-items: center;
   gap: 8px;
 }
@@ -128,7 +130,7 @@
   border: none;
   color: var(--nc-white);
   font-family: var(--font-stack);
-  font-size: 18px;
+  font-size: 1em;
   flex: 1;
   outline: none;
 }
@@ -145,7 +147,7 @@
   color: var(--nc-black);
   margin-right: 2px;
   padding: 8px 2px;
-  font-size: 18px;
+  font-size: 0.9em;
   text-align: center;
   cursor: pointer;
   display: flex;
