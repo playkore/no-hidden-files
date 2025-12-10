@@ -8,13 +8,18 @@ const currentPathAtom = atom<FsPath>([]);
 const selectedIndexAtom = atom<number>(0);
 const diskAtom = atom<string>("C");
 
-function resolveEntries(fs: FileSystem, path: FsPath): FsNode[] {
+function getNode(fs: FileSystem, path: FsPath): FsNode {
   let node: FsNode = fs;
   for (const segment of path) {
     const next = node.children?.find((child) => child.name === segment);
     if (!next) break;
     node = next;
   }
+  return node;
+}
+
+function resolveEntries(fs: FileSystem, path: FsPath): FsNode[] {
+  const node = getNode(fs, path);
 
   const items = node.children ?? [];
   if (path.length === 0) {
@@ -37,9 +42,22 @@ export function useFileSystem() {
   );
 
   const goToParent = useCallback(() => {
-    setCurrentPath((path) => path.slice(0, -1));
-    setSelectedIndex(0);
-  }, [setCurrentPath, setSelectedIndex]);
+    if (currentPath.length === 0) {
+      setSelectedIndex(0);
+      return;
+    }
+
+    const parentPath = currentPath.slice(0, -1);
+    const lastSegment = currentPath[currentPath.length - 1];
+    const parentNode = getNode(fs, parentPath);
+    const children = parentNode.children ?? [];
+    const childIndex = children.findIndex((child) => child.name === lastSegment);
+    const offset = parentPath.length === 0 ? 0 : 1;
+    const targetIndex = childIndex >= 0 ? childIndex + offset : 0;
+
+    setCurrentPath(parentPath);
+    setSelectedIndex(targetIndex);
+  }, [currentPath, fs, setCurrentPath, setSelectedIndex]);
 
   const enterDirectory = useCallback(
     (dirName: string) => {
