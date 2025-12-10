@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type {
   MouseEvent as ReactMouseEvent,
   TouchEvent as ReactTouchEvent,
@@ -17,38 +17,48 @@ interface GameInstance {
   destroy: () => void;
 }
 
-interface GameElements {
+interface GameConfig {
   canvas: HTMLCanvasElement;
-  scoreElement: HTMLElement;
-  gameOverElement: HTMLElement;
-  gameOverMessage: HTMLElement;
+  onScoreChange: (score: number) => void;
+  onGameOver: (message: string) => void;
+  onReset: () => void;
 }
 
 export function QbertGame({ onClose }: QbertGameProps) {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const scoreRef = useRef<HTMLDivElement | null>(null);
-  const gameOverRef = useRef<HTMLDivElement | null>(null);
-  const goMessageRef = useRef<HTMLParagraphElement | null>(null);
-  const gameRef = useRef<GameInstance | null>(null);
+  const [score, setScore] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [gameOverMessage, setGameOverMessage] = useState("");
+  const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
+  const [gameInstance, setGameInstance] = useState<GameInstance | null>(null);
 
   useEffect(() => {
-    if (!canvasRef.current || !scoreRef.current || !gameOverRef.current || !goMessageRef.current) {
+    if (!canvasElement) {
       return;
     }
 
     const instance = createQbertGame({
-      canvas: canvasRef.current,
-      scoreElement: scoreRef.current,
-      gameOverElement: gameOverRef.current,
-      gameOverMessage: goMessageRef.current,
+      canvas: canvasElement,
+      onScoreChange: setScore,
+      onGameOver: (message) => {
+        setGameOverMessage(message);
+        setIsGameOver(true);
+      },
+      onReset: () => {
+        setIsGameOver(false);
+        setGameOverMessage("");
+      },
     });
 
-    gameRef.current = instance;
+    setGameInstance(instance);
 
     return () => {
+      setGameInstance(null);
       instance.destroy();
-      gameRef.current = null;
     };
+  }, [canvasElement]);
+
+  const handleCanvasRef = useCallback((node: HTMLCanvasElement | null) => {
+    setCanvasElement(node);
   }, []);
 
   const handlePress =
@@ -59,7 +69,7 @@ export function QbertGame({ onClose }: QbertGameProps) {
         | ReactTouchEvent<HTMLButtonElement>
     ) => {
       event.preventDefault();
-      gameRef.current?.handleInput(action);
+      gameInstance?.handleInput(action);
     };
 
   return (
@@ -77,10 +87,10 @@ export function QbertGame({ onClose }: QbertGameProps) {
         </button>
       )}
       <div className={styles.uiLayer}>
-        <div ref={scoreRef}>SCORE: 0</div>
+        <div>SCORE: {score}</div>
         <div>LVL: 1</div>
       </div>
-      <canvas ref={canvasRef} className={styles.canvas} />
+      <canvas ref={handleCanvasRef} className={styles.canvas} />
       <div className={styles.controls}>
         <button
           type="button"
@@ -115,13 +125,13 @@ export function QbertGame({ onClose }: QbertGameProps) {
           ↙
         </button>
       </div>
-      <div ref={gameOverRef} className={styles.gameOver}>
+      <div className={styles.gameOver} style={{ display: isGameOver ? "block" : "none" }}>
         <h1>GAME OVER</h1>
-        <p ref={goMessageRef}></p>
+        <p>{gameOverMessage}</p>
         <button
           type="button"
           className={styles.restartBtn}
-          onClick={() => gameRef.current?.resetGame()}
+          onClick={() => gameInstance?.resetGame()}
         >
           RETRY
         </button>
@@ -132,18 +142,19 @@ export function QbertGame({ onClose }: QbertGameProps) {
 
 function createQbertGame({
   canvas,
-  scoreElement,
-  gameOverElement,
-  gameOverMessage,
-}: GameElements): GameInstance {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) {
+  onScoreChange,
+  onGameOver,
+  onReset,
+}: GameConfig): GameInstance {
+  const renderingContext = canvas.getContext("2d");
+  if (!renderingContext) {
     return {
       handleInput: () => undefined,
       resetGame: () => undefined,
       destroy: () => undefined,
     };
   }
+  const ctx: CanvasRenderingContext2D = renderingContext;
 
   const PALETTE = {
     black: "#000000",
@@ -232,8 +243,8 @@ function createQbertGame({
     isGameOver = false;
     player.dead = false;
     player.dieOnLand = false;
-    gameOverElement.style.display = "none";
-    scoreElement.textContent = `SCORE: ${score}`;
+    onReset();
+    onScoreChange(score);
 
     for (let r = 0; r < ROWS; r += 1) {
       const row: Tile[] = [];
@@ -389,9 +400,9 @@ function createQbertGame({
   }
 
   function checkWin() {
-    for (let r = 0; r < ROWS; r += 1) {
-      for (let c = 0; c <= r; c += 1) {
-        if (!map[r][c].active) {
+    for (const row of map) {
+      for (const tile of row) {
+        if (!tile.active) {
           return;
         }
       }
@@ -437,11 +448,11 @@ function createQbertGame({
           return;
         }
 
-        const tile = map[player.r][player.c];
+        const tile = map[player.r]?.[player.c];
         if (tile && !tile.active) {
           tile.active = true;
           score += 25;
-          scoreElement.textContent = `SCORE: ${score}`;
+          onScoreChange(score);
           checkWin();
         }
       } else {
@@ -471,6 +482,9 @@ function createQbertGame({
 
     for (let i = enemies.length - 1; i >= 0; i -= 1) {
       const enemy = enemies[i];
+      if (!enemy) {
+        continue;
+      }
       if (enemy.isJumping) {
         enemy.jumpProgress += dt * 1.8;
         if (enemy.jumpProgress >= 1) {
@@ -518,9 +532,9 @@ function createQbertGame({
     ctx.fillStyle = PALETTE.black;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    for (let r = 0; r < ROWS; r += 1) {
-      for (let c = 0; c <= r; c += 1) {
-        drawCube(r, c, map[r][c].active);
+    for (const row of map) {
+      for (const tile of row) {
+        drawCube(tile.r, tile.c, tile.active);
       }
     }
 
@@ -539,8 +553,7 @@ function createQbertGame({
   function gameOver(message: string) {
     isGameOver = true;
     player.dead = true;
-    gameOverMessage.textContent = message;
-    gameOverElement.style.display = "block";
+    onGameOver(message);
   }
 
   function resetGame() {

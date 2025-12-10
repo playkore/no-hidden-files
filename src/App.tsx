@@ -4,7 +4,6 @@ import { useFileSystem } from "./hooks/useFileSystem";
 import { useCommandPrompt } from "./hooks/useCommandPrompt";
 import { formatPath } from "./utils/path";
 import { NcScreen } from "./components/NcScreen";
-import { VirtualKeyboard } from "./components/VirtualKeyboard";
 import { QbertGame } from "./components/games/qbert/QbertGame";
 import styles from "./App.module.css";
 
@@ -126,21 +125,6 @@ export default function App() {
     selectedEntry,
     setSelectedIndex,
   ]);
-
-  const handleVirtualNavigation = useCallback(
-    (action: "up" | "down" | "left" | "right" | "enter") => {
-      if (action === "up") {
-        setSelectedIndex((i) => clampIndex(i - 1));
-      } else if (action === "down") {
-        setSelectedIndex((i) => clampIndex(i + 1));
-      } else if (action === "left") {
-        goToParent();
-      } else {
-        changeDirectory(selectedEntry);
-      }
-    },
-    [changeDirectory, clampIndex, goToParent, selectedEntry, setSelectedIndex]
-  );
 
   function handleTouch(entry: FsNode, index: number, timeStamp: number) {
     setSelectedIndex(clampIndex(index));
