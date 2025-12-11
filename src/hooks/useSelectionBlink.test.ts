@@ -92,9 +92,8 @@ describe("useSelectionBlink", () => {
   it("should cancel the blink and reset state", () => {
     const { result } = renderHook(() => useSelectionBlink());
 
-    let blinkPromise: Promise<void>;
     act(() => {
-      blinkPromise = result.current.blink();
+      result.current.blink();
     });
 
     expect(result.current.isBlinking).toBe(true);
