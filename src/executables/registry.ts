@@ -1,4 +1,7 @@
 import type { ComponentType } from "react";
+import Elite from "../components/games/Elite";
+import Pinball from "../components/games/Pinball";
+import TicTacToe from "../components/games/TicTacToe";
 import { QbertGame } from "../components/games/qbert/QbertGame";
 
 export interface ExecutableComponentProps {
@@ -7,10 +10,13 @@ export interface ExecutableComponentProps {
 
 type ExecutableComponent = ComponentType<ExecutableComponentProps>;
 
-export type ExecutableId = "qbert";
+export type ExecutableId = "qbert" | "elite" | "pinball" | "tictactoe";
 
 const executableRegistry = {
   qbert: QbertGame,
+  elite: Elite,
+  pinball: Pinball,
+  tictactoe: TicTacToe,
 } satisfies Record<string, ExecutableComponent>;
 
 export function getExecutableComponent(id: ExecutableId): ExecutableComponent {
