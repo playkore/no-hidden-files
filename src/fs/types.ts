@@ -18,6 +18,8 @@ export interface FsNode {
   children?: FsNode[];
   /** Identifier for executable component to launch when activated */
   executableId?: ExecutableId;
+  /** Optional inline text content for viewable files */
+  content?: string;
 }
 
 /**

@@ -18,3 +18,9 @@
 .gameWindow {
   flex: 1;
 }
+
+.viewerWindow {
+  margin: auto;
+  width: min(700px, 90vw);
+  max-height: 80vh;
+}

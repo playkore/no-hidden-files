@@ -1,0 +1,57 @@
+.viewer {
+  background-color: var(--nc-blue);
+  border: 3px double var(--nc-white);
+  color: var(--nc-bright-white);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.header {
+  background-color: var(--nc-cyan);
+  color: var(--nc-black);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 8px;
+  font-weight: bold;
+}
+
+.title {
+  text-transform: uppercase;
+}
+
+.closeButton {
+  background-color: var(--nc-black);
+  color: var(--nc-cyan);
+  border: 1px solid var(--nc-cyan);
+  padding: 2px 12px;
+  cursor: pointer;
+}
+
+.body {
+  flex: 1;
+  padding: 8px;
+  background-color: var(--nc-black);
+  color: var(--nc-bright-white);
+  min-height: 0;
+}
+
+.content {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: var(--font-stack);
+  font-size: 1.4rem;
+  line-height: 1.4;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.footer {
+  background-color: var(--nc-black);
+  color: var(--nc-white);
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  font-size: 1.2rem;
+}

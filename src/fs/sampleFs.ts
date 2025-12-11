@@ -46,6 +46,11 @@ export const sampleFs: FileSystem = {
               type: "file",
               size: 1792,
               date: "1989-05-01",
+              content: `QBERT README
+
+Use arrow keys to bounce Q*bert around the pyramid.
+Avoid Coily, Ugg and Wrong Way.
+Use disks to escape danger and finish levels fast!`,
             },
           ],
         },
@@ -66,6 +71,12 @@ export const sampleFs: FileSystem = {
               type: "file",
               size: 40960,
               date: "1984-09-15",
+              content: `ELITE FLIGHT MANUAL
+
+1. Launch from Lave station.
+2. Buy fuel and missiles before leaving.
+3. Scoop cargo from debris clouds carefully.
+4. Dock with gentle thrust - trust the compass.`,
             },
             { name: "lave.map", type: "file", size: 8192, date: "1984-09-12" },
           ],
@@ -108,6 +119,13 @@ export const sampleFs: FileSystem = {
               type: "file",
               size: 2048,
               date: "1991-02-05",
+              content: `TICTACTOE README
+
+Beat the AI by forcing forks.
+Use the numpad layout to place moves:
+7 8 9
+4 5 6
+1 2 3`,
             },
             { name: "ai.dat", type: "file", size: 1024, date: "1991-02-01" },
           ],
@@ -129,12 +147,36 @@ export const sampleFs: FileSystem = {
               type: "file",
               size: 2048,
               date: "1993-11-12",
+              content: `CHAPTER ONE
+
+Night settled over the colony as the last shuttle departed.
+In the silence, the signal began pulsing from deep beneath the ice.`,
             },
           ],
         },
-        { name: "mission1.txt", type: "file", size: 4096, date: "1993-12-01" },
+        {
+          name: "mission1.txt",
+          type: "file",
+          size: 4096,
+          date: "1993-12-01",
+          content: `MISSION ORDERS
+
+Primary Objective: Recover the lost navigation chip.
+Secondary Objective: Keep damage below 20%.
+Abort code: DELTA-BLUE.`,
+        },
       ],
     },
-    { name: "readme.txt", type: "file", size: 1024, date: "1993-12-10" },
+    {
+      name: "readme.txt",
+      type: "file",
+      size: 1024,
+      date: "1993-12-10",
+      content: `SYSTEM README
+
+Welcome to the shareware disk!
+Use cursor keys to explore directories.
+Press ENTER to run games or VIEW to inspect docs.`,
+    },
   ],
 };

@@ -6,6 +6,7 @@ import { useCommandPrompt } from "./hooks/useCommandPrompt";
 import { useSelectionBlink } from "./hooks/useSelectionBlink";
 import { formatPath } from "./utils/path";
 import { NcScreen } from "./components/NcScreen";
+import { NcViewer } from "./components/NcViewer";
 import type { ExecutableId } from "./executables/registry";
 import { getExecutableComponent } from "./executables/registry";
 import styles from "./App.module.css";
@@ -54,8 +55,13 @@ export default function App() {
   } = useFileSystem();
   const [activeExecutableId, setActiveExecutableId] =
     useState<ExecutableId | null>(null);
+  const [viewerEntry, setViewerEntry] = useState<{
+    title: string;
+    content: string;
+  } | null>(null);
   const { isBlinking, blink } = useSelectionBlink();
   const entriesLength = entries.length;
+  const closeViewer = useCallback(() => setViewerEntry(null), [setViewerEntry]);
 
   const clampIndex = useCallback(
     (index: number) => {
@@ -78,13 +84,18 @@ export default function App() {
         return;
       }
 
+      if (entry.content) {
+        setViewerEntry({ title: entry.name, content: entry.content });
+        return;
+      }
+
       if (entry.name === "..") {
         goToParent();
       } else if (entry.type === "dir") {
         enterDirectory(entry.name);
       }
     },
-    [blink, enterDirectory, goToParent, setActiveExecutableId]
+    [blink, enterDirectory, goToParent, setActiveExecutableId, setViewerEntry]
   );
 
   const safeIndex = clampIndex(selectedIndex);
@@ -98,7 +109,7 @@ export default function App() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (activeExecutableId) {
+      if (activeExecutableId || viewerEntry) {
         return;
       }
       if (e.key === "ArrowDown") {
@@ -123,7 +134,21 @@ export default function App() {
     goToParent,
     selectedEntry,
     setSelectedIndex,
+    viewerEntry,
   ]);
+
+  useEffect(() => {
+    function onViewerKey(e: KeyboardEvent) {
+      if (!viewerEntry) return;
+      if (e.key === "Escape" || e.key === "F3") {
+        e.preventDefault();
+        closeViewer();
+      }
+    }
+
+    window.addEventListener("keydown", onViewerKey);
+    return () => window.removeEventListener("keydown", onViewerKey);
+  }, [closeViewer, viewerEntry]);
 
   const handleEntryInteraction = useCallback(
     (entry: FsNode, index: number) => {
@@ -170,6 +195,17 @@ export default function App() {
           <div className={styles.gameWindow}>
             <ActiveExecutableComponent
               onClose={() => setActiveExecutableId(null)}
+            />
+          </div>
+        </div>
+      )}
+      {viewerEntry && (
+        <div className={styles.overlay}>
+          <div className={styles.viewerWindow}>
+            <NcViewer
+              title={viewerEntry.title}
+              content={viewerEntry.content}
+              onClose={closeViewer}
             />
           </div>
         </div>

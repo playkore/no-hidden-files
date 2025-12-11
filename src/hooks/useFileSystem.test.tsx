@@ -27,7 +27,7 @@ describe('useFileSystem', () => {
       result.current.enterDirectory('games')
     })
     expect(result.current.currentPath).toEqual(['games'])
-    expect(result.current.entries.some((entry) => entry.name === 'doom')).toBe(true)
+    expect(result.current.entries.some((entry) => entry.name === 'qbert')).toBe(true)
 
     act(() => {
       result.current.goToParent()

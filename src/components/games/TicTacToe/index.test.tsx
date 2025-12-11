@@ -41,21 +41,18 @@ describe("canWinByOuterMove", () => {
   });
 
   it("allows winning outer moves at indices 10 (left edge) and 3 (top edge)", () => {
-    // NOTE: The originally requested board contained an 'X' at center, which would NOT
-    // make index 10 a winning move. Adjusted board so the inner sequence cells needed
-    // for both outer moves are the player's mark 'O'.
     // Requirements for index 10 (left middle outer): board[3] & board[4] must both be 'O'.
     // Requirements for index 3 (top row near right outer): board[2] & board[5] must both be 'O'.
     const board = [
-      "",  // 0
-      "O", // 1
-      "", // 2
+      "X", // 0
+      "", // 1
+      "O", // 2
       "O", // 3
-      "X", // 4
-      "", // 5
-      "X",  // 6
-      "X",  // 7
-      "",  // 8
+      "O", // 4
+      "O", // 5
+      "", // 6
+      "", // 7
+      "", // 8
     ];
     expect(canWinByOuterMove(10, board, "O")).toBe(true);
     expect(canWinByOuterMove(3, board, "O")).toBe(true);
