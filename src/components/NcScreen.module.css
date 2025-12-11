@@ -181,4 +181,5 @@
 .isDir {
   color: var(--nc-bright-white);
   font-weight: bold;
+  text-transform: uppercase;
 }
