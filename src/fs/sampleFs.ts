@@ -28,7 +28,13 @@ export const sampleFs: FileSystem = {
           type: 'dir',
           date: '1989-05-10',
           children: [
-            { name: 'qbert.exe', type: 'file', size: 90112, date: '1989-05-10' },
+            {
+              name: 'qbert.exe',
+              type: 'file',
+              size: 90112,
+              date: '1989-05-10',
+              executableId: 'qbert',
+            },
             { name: 'pyramid.dat', type: 'file', size: 16384, date: '1989-05-08' },
             { name: 'sprites.qb', type: 'file', size: 24576, date: '1989-05-07' },
             { name: 'sounds.bin', type: 'file', size: 8192, date: '1989-05-05' },

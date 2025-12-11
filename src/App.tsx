@@ -6,7 +6,8 @@ import { useCommandPrompt } from "./hooks/useCommandPrompt";
 import { useSelectionBlink } from "./hooks/useSelectionBlink";
 import { formatPath } from "./utils/path";
 import { NcScreen } from "./components/NcScreen";
-import { QbertGame } from "./components/games/qbert/QbertGame";
+import type { ExecutableId } from "./executables/registry";
+import { getExecutableComponent } from "./executables/registry";
 import styles from "./App.module.css";
 
 const menuItems = ["Left", "File", "Disk", "Cards", "Right"];
@@ -51,9 +52,8 @@ export default function App() {
     enterDirectory,
     disk,
   } = useFileSystem();
-  const [activeExecutable, setActiveExecutable] = useState<"qbert" | null>(
-    null
-  );
+  const [activeExecutableId, setActiveExecutableId] =
+    useState<ExecutableId | null>(null);
   const { isBlinking, blink } = useSelectionBlink();
   const entriesLength = entries.length;
 
@@ -65,7 +65,7 @@ export default function App() {
     [entriesLength]
   );
 
-  const selectEntry = useCallback(
+  const activateEntry = useCallback(
     async (entry?: FsNode) => {
       if (!entry) {
         return;
@@ -73,15 +73,8 @@ export default function App() {
 
       await blink();
 
-      const normalizedPath = currentPath.map((segment) =>
-        segment.toLowerCase()
-      );
-      if (
-        entry.type === "file" &&
-        entry.name.toLowerCase() === "qbert.exe" &&
-        normalizedPath.join("/") === "games/qbert"
-      ) {
-        setActiveExecutable("qbert");
+      if (entry.executableId) {
+        setActiveExecutableId(entry.executableId);
         return;
       }
 
@@ -91,7 +84,7 @@ export default function App() {
         enterDirectory(entry.name);
       }
     },
-    [blink, currentPath, enterDirectory, goToParent, setActiveExecutable]
+    [blink, enterDirectory, goToParent, setActiveExecutableId]
   );
 
   const safeIndex = clampIndex(selectedIndex);
@@ -105,7 +98,7 @@ export default function App() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (activeExecutable) {
+      if (activeExecutableId) {
         return;
       }
       if (e.key === "ArrowDown") {
@@ -115,17 +108,17 @@ export default function App() {
       } else if (e.key === "ArrowLeft") {
         goToParent();
       } else if (e.key === "ArrowRight") {
-        selectEntry(selectedEntry);
+        activateEntry(selectedEntry);
       } else if (e.key === "Enter") {
-        selectEntry(selectedEntry);
+        activateEntry(selectedEntry);
       }
     }
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [
-    activeExecutable,
-    selectEntry,
+    activeExecutableId,
+    activateEntry,
     clampIndex,
     goToParent,
     selectedEntry,
@@ -136,12 +129,12 @@ export default function App() {
     (entry: FsNode, index: number) => {
       const nextIndex = clampIndex(index);
       if (safeIndex === nextIndex) {
-        selectEntry(entry);
+        activateEntry(entry);
       } else {
         setSelectedIndex(nextIndex);
       }
     },
-    [selectEntry, clampIndex, safeIndex, setSelectedIndex]
+    [activateEntry, clampIndex, safeIndex, setSelectedIndex]
   );
 
   const handleTouch = useCallback(
@@ -151,6 +144,10 @@ export default function App() {
     },
     [handleEntryInteraction]
   );
+
+  const ActiveExecutableComponent = activeExecutableId
+    ? getExecutableComponent(activeExecutableId)
+    : null;
 
   return (
     <div className={styles.app}>
@@ -168,10 +165,12 @@ export default function App() {
         promptText={promptText}
         promptInputValue={promptInputValue}
       />
-      {activeExecutable === "qbert" && (
+      {ActiveExecutableComponent && (
         <div className={styles.overlay}>
           <div className={styles.gameWindow}>
-            <QbertGame onClose={() => setActiveExecutable(null)} />
+            <ActiveExecutableComponent
+              onClose={() => setActiveExecutableId(null)}
+            />
           </div>
         </div>
       )}

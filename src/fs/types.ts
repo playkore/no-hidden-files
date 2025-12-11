@@ -1,7 +1,10 @@
+import type { ExecutableId } from "../executables/registry";
+
 /**
  * Represents a node in the virtual filesystem.
  * Can be either a file or a directory.
  */
+
 export interface FsNode {
   /** Name of the file or directory */
   name: string;
@@ -13,6 +16,8 @@ export interface FsNode {
   date?: string;
   /** Child nodes if this is a directory */
   children?: FsNode[];
+  /** Identifier for executable component to launch when activated */
+  executableId?: ExecutableId;
 }
 
 /**
