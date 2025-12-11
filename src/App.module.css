@@ -19,8 +19,18 @@
   flex: 1;
 }
 
+.viewerOverlay {
+  background: var(--nc-black);
+  padding: 8px;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
 .viewerWindow {
-  margin: auto;
-  width: min(700px, 90vw);
-  max-height: 80vh;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  flex: 1;
+  display: flex;
+  min-height: 0;
 }

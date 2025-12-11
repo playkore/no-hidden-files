@@ -200,7 +200,7 @@ export default function App() {
         </div>
       )}
       {viewerEntry && (
-        <div className={styles.overlay}>
+        <div className={`${styles.overlay} ${styles.viewerOverlay}`}>
           <div className={styles.viewerWindow}>
             <NcViewer
               title={viewerEntry.title}
