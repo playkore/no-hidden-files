@@ -26,11 +26,11 @@ describe("App", () => {
     expect(screen.getByRole("textbox")).toHaveValue("readme.txt");
   });
 
-  it("shows parent directory (..) after entering a subdirectory", () => {
+  it("shows parent directory (..) after entering a subdirectory", async () => {
     render(<App />);
     const gamesButton = screen.getByRole("button", { name: /games/i });
     fireEvent.click(gamesButton);
     fireEvent.click(gamesButton);
-    expect(screen.getByText(/\.\./)).toBeInTheDocument();
+    expect(await screen.findByText(/\.\./)).toBeInTheDocument();
   });
 });
