@@ -65,7 +65,7 @@ export default function App() {
     [entriesLength]
   );
 
-  const changeDirectory = useCallback(
+  const selectEntry = useCallback(
     async (entry?: FsNode) => {
       if (!entry) {
         return;
@@ -115,9 +115,9 @@ export default function App() {
       } else if (e.key === "ArrowLeft") {
         goToParent();
       } else if (e.key === "ArrowRight") {
-        changeDirectory(selectedEntry);
+        selectEntry(selectedEntry);
       } else if (e.key === "Enter") {
-        changeDirectory(selectedEntry);
+        selectEntry(selectedEntry);
       }
     }
 
@@ -125,7 +125,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [
     activeExecutable,
-    changeDirectory,
+    selectEntry,
     clampIndex,
     goToParent,
     selectedEntry,
@@ -136,12 +136,12 @@ export default function App() {
     (entry: FsNode, index: number) => {
       const nextIndex = clampIndex(index);
       if (safeIndex === nextIndex) {
-        changeDirectory(entry);
+        selectEntry(entry);
       } else {
         setSelectedIndex(nextIndex);
       }
     },
-    [changeDirectory, clampIndex, safeIndex, setSelectedIndex]
+    [selectEntry, clampIndex, safeIndex, setSelectedIndex]
   );
 
   const handleTouch = useCallback(
