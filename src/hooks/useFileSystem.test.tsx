@@ -13,10 +13,8 @@ describe('useFileSystem', () => {
     })
 
     expect(result.current.currentPath).toEqual([])
-    expect(result.current.entries[0]).toMatchObject({ name: '..', type: 'dir' })
     const names = result.current.entries.map((entry) => entry.name)
-    expect(names).toContain('games')
-    expect(names).toContain('docs')
+    expect(names).toEqual(['games', 'docs', 'readme.txt'])
     expect(result.current.selectedIndex).toBe(0)
   })
 
@@ -49,6 +47,6 @@ describe('useFileSystem', () => {
     expect(result.current.selectedIndex).toBe(0)
 
     act(() => result.current.goToParent())
-    expect(result.current.selectedIndex).toBe(0)
+    expect(result.current.selectedIndex).toBe(1)
   })
 })

@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from "react";
+import type { TouchEvent } from "react";
 import type { FsNode } from "../fs/types";
 import styles from "./NcScreen.module.css";
 
@@ -13,10 +13,12 @@ interface NcScreenProps {
   currentPathLabel: string;
   entries: FsNode[];
   safeIndex: number;
-  clampIndex: (index: number) => number;
-  changeDirectory: (entry?: FsNode) => void;
-  setSelectedIndex: Dispatch<SetStateAction<number>>;
-  handleTouch: (entry: FsNode, index: number, timeStamp: number) => void;
+  handleEntryInteraction: (entry: FsNode, index: number) => void;
+  handleTouch: (
+    event: TouchEvent<HTMLButtonElement>,
+    entry: FsNode,
+    index: number
+  ) => void;
   formatSize: (entry: FsNode) => string;
   formatDateText: (date?: string) => string;
   promptText: string;
@@ -29,9 +31,7 @@ export function NcScreen({
   currentPathLabel,
   entries,
   safeIndex,
-  clampIndex,
-  changeDirectory,
-  setSelectedIndex,
+  handleEntryInteraction,
   handleTouch,
   formatSize,
   formatDateText,
@@ -71,11 +71,8 @@ export function NcScreen({
                 type="button"
                 key={`${entry.name}-${index}`}
                 className={rowClass}
-                onClick={() => setSelectedIndex(clampIndex(index))}
-                onDoubleClick={() => changeDirectory(entry)}
-                onTouchEnd={(event) =>
-                  handleTouch(entry, index, event.timeStamp)
-                }
+                onClick={() => handleEntryInteraction(entry, index)}
+                onTouchEnd={(event) => handleTouch(event, entry, index)}
               >
                 <span className={styles.fileName}>{entry.name}</span>
                 <span className={styles.fileSize}>{formatSize(entry)}</span>

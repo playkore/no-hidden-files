@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import type { TouchEvent } from "react";
 import type { FsNode } from "./fs/types";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useCommandPrompt } from "./hooks/useCommandPrompt";
@@ -49,10 +50,6 @@ export default function App() {
     enterDirectory,
     disk,
   } = useFileSystem();
-  const lastTapRef = useRef<{ index: number; time: number }>({
-    index: -1,
-    time: 0,
-  });
   const [activeExecutable, setActiveExecutable] = useState<"qbert" | null>(null);
   const entriesLength = entries.length;
 
@@ -126,16 +123,29 @@ export default function App() {
     setSelectedIndex,
   ]);
 
-  function handleTouch(entry: FsNode, index: number, timeStamp: number) {
-    setSelectedIndex(clampIndex(index));
-    const { index: lastIndex, time } = lastTapRef.current;
-    if (lastIndex === index && timeStamp - time < 350) {
-      changeDirectory(entry);
-      lastTapRef.current = { index: -1, time: 0 };
-    } else {
-      lastTapRef.current = { index, time: timeStamp };
-    }
-  }
+  const handleEntryInteraction = useCallback(
+    (entry: FsNode, index: number) => {
+      const nextIndex = clampIndex(index);
+      if (safeIndex === nextIndex) {
+        changeDirectory(entry);
+      } else {
+        setSelectedIndex(nextIndex);
+      }
+    },
+    [changeDirectory, clampIndex, safeIndex, setSelectedIndex]
+  );
+
+  const handleTouch = useCallback(
+    (
+      event: TouchEvent<HTMLButtonElement>,
+      entry: FsNode,
+      index: number
+    ) => {
+      event.preventDefault();
+      handleEntryInteraction(entry, index);
+    },
+    [handleEntryInteraction]
+  );
 
   return (
     <div className={styles.app}>
@@ -145,9 +155,7 @@ export default function App() {
         currentPathLabel={currentPathLabel}
         entries={entries}
         safeIndex={safeIndex}
-        clampIndex={clampIndex}
-        changeDirectory={changeDirectory}
-        setSelectedIndex={setSelectedIndex}
+        handleEntryInteraction={handleEntryInteraction}
         handleTouch={handleTouch}
         formatSize={formatSize}
         formatDateText={formatDateText}

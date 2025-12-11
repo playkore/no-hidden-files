@@ -26,8 +26,11 @@ describe("App", () => {
     expect(screen.getByRole("textbox")).toHaveValue("readme.txt");
   });
 
-  it("shows parent directory (..) as first entry", () => {
+  it("shows parent directory (..) after entering a subdirectory", () => {
     render(<App />);
+    const gamesButton = screen.getByRole("button", { name: /games/i });
+    fireEvent.click(gamesButton);
+    fireEvent.click(gamesButton);
     expect(screen.getByText(/\.\./)).toBeInTheDocument();
   });
 });

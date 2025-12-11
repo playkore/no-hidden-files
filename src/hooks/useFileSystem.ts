@@ -1,30 +1,16 @@
 import { useCallback, useMemo } from "react";
 import { atom, useAtom, useAtomValue } from "jotai";
 import { sampleFs } from "../fs/sampleFs";
-import type { FileSystem, FsNode, FsPath } from "../fs/types";
+import {
+  getSelectionIndexForPathChange,
+  resolveEntries,
+} from "../fs/navigation";
+import type { FileSystem, FsPath } from "../fs/types";
 
 const fsAtom = atom<FileSystem>(sampleFs);
 const currentPathAtom = atom<FsPath>([]);
 const selectedIndexAtom = atom<number>(0);
 const diskAtom = atom<string>("C");
-
-function getNode(fs: FileSystem, path: FsPath): FsNode {
-  let node: FsNode = fs;
-  for (const segment of path) {
-    const next = node.children?.find((child) => child.name === segment);
-    if (!next) break;
-    node = next;
-  }
-  return node;
-}
-
-function resolveEntries(fs: FileSystem, path: FsPath): FsNode[] {
-  const node = getNode(fs, path);
-
-  const items = node.children ?? [];
-  const parentEntry: FsNode = { name: "..", type: "dir", date: node.date };
-  return [parentEntry, ...items];
-}
 
 export function useFileSystem() {
   const fs = useAtomValue(fsAtom);
@@ -44,16 +30,29 @@ export function useFileSystem() {
     }
 
     const parentPath = currentPath.slice(0, -1);
+    const nextSelection = getSelectionIndexForPathChange(
+      fs,
+      currentPath,
+      parentPath
+    );
+
     setCurrentPath(parentPath);
-    setSelectedIndex(0);
-  }, [currentPath, setCurrentPath, setSelectedIndex]);
+    setSelectedIndex(nextSelection);
+  }, [currentPath, fs, setCurrentPath, setSelectedIndex]);
 
   const enterDirectory = useCallback(
     (dirName: string) => {
-      setCurrentPath((path) => [...path, dirName]);
-      setSelectedIndex(0);
+      const nextPath = [...currentPath, dirName];
+      const nextSelection = getSelectionIndexForPathChange(
+        fs,
+        currentPath,
+        nextPath
+      );
+
+      setCurrentPath(nextPath);
+      setSelectedIndex(nextSelection);
     },
-    [setCurrentPath, setSelectedIndex]
+    [currentPath, fs, setCurrentPath, setSelectedIndex]
   );
 
   return {
