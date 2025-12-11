@@ -3,6 +3,7 @@ import type { TouchEvent } from "react";
 import type { FsNode } from "./fs/types";
 import { useFileSystem } from "./hooks/useFileSystem";
 import { useCommandPrompt } from "./hooks/useCommandPrompt";
+import { useSelectionBlink } from "./hooks/useSelectionBlink";
 import { formatPath } from "./utils/path";
 import { NcScreen } from "./components/NcScreen";
 import { QbertGame } from "./components/games/qbert/QbertGame";
@@ -50,7 +51,10 @@ export default function App() {
     enterDirectory,
     disk,
   } = useFileSystem();
-  const [activeExecutable, setActiveExecutable] = useState<"qbert" | null>(null);
+  const [activeExecutable, setActiveExecutable] = useState<"qbert" | null>(
+    null
+  );
+  const { isBlinking, blink } = useSelectionBlink();
   const entriesLength = entries.length;
 
   const clampIndex = useCallback(
@@ -62,8 +66,13 @@ export default function App() {
   );
 
   const changeDirectory = useCallback(
-    (entry?: FsNode) => {
-      if (!entry) return;
+    async (entry?: FsNode) => {
+      if (!entry) {
+        return;
+      }
+
+      await blink();
+
       const normalizedPath = currentPath.map((segment) =>
         segment.toLowerCase()
       );
@@ -82,7 +91,7 @@ export default function App() {
         enterDirectory(entry.name);
       }
     },
-    [currentPath, enterDirectory, goToParent, setActiveExecutable]
+    [blink, currentPath, enterDirectory, goToParent, setActiveExecutable]
   );
 
   const safeIndex = clampIndex(selectedIndex);
@@ -136,11 +145,7 @@ export default function App() {
   );
 
   const handleTouch = useCallback(
-    (
-      event: TouchEvent<HTMLButtonElement>,
-      entry: FsNode,
-      index: number
-    ) => {
+    (event: TouchEvent<HTMLButtonElement>, entry: FsNode, index: number) => {
       event.preventDefault();
       handleEntryInteraction(entry, index);
     },
@@ -155,6 +160,7 @@ export default function App() {
         currentPathLabel={currentPathLabel}
         entries={entries}
         safeIndex={safeIndex}
+        isBlinking={isBlinking}
         handleEntryInteraction={handleEntryInteraction}
         handleTouch={handleTouch}
         formatSize={formatSize}

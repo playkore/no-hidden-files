@@ -92,6 +92,21 @@
   color: var(--nc-black);
 }
 
+.fileRow.blinking {
+  animation: fileRowBlink 0.25s steps(2, start) infinite;
+}
+
+@keyframes fileRowBlink {
+  0% {
+    background-color: var(--nc-cyan);
+    color: var(--nc-black);
+  }
+  100% {
+    background-color: var(--nc-white);
+    color: var(--nc-blue);
+  }
+}
+
 .fileName {
   flex: 1;
   white-space: nowrap;

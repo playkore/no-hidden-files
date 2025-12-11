@@ -13,6 +13,7 @@ interface NcScreenProps {
   currentPathLabel: string;
   entries: FsNode[];
   safeIndex: number;
+  isBlinking: boolean;
   handleEntryInteraction: (entry: FsNode, index: number) => void;
   handleTouch: (
     event: TouchEvent<HTMLButtonElement>,
@@ -31,6 +32,7 @@ export function NcScreen({
   currentPathLabel,
   entries,
   safeIndex,
+  isBlinking,
   handleEntryInteraction,
   handleTouch,
   formatSize,
@@ -59,10 +61,12 @@ export function NcScreen({
         <div className={styles.fileList}>
           {entries.map((entry, index) => {
             const isActive = index === safeIndex;
+            const shouldBlink = isBlinking && isActive;
             const rowClass = [
               styles.fileRow,
               isActive ? styles.active : "",
               entry.type === "dir" ? styles.isDir : "",
+              shouldBlink ? styles.blinking : "",
             ]
               .filter(Boolean)
               .join(" ");
