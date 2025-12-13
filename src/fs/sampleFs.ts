@@ -130,6 +130,31 @@ Use the numpad layout to place moves:
             { name: "ai.dat", type: "file", size: 1024, date: "1991-02-01" },
           ],
         },
+        {
+          name: "bomberman",
+          type: "dir",
+          date: "1991-08-22",
+          children: [
+            {
+              name: "bomber.exe",
+              type: "file",
+              size: 131072,
+              date: "1991-08-22",
+              executableId: "bomberman",
+            },
+            {
+              name: "manual.txt",
+              type: "file",
+              size: 2048,
+              date: "1991-08-18",
+              content: `BOMBERMAN FIELD MANUAL
+
+Drop bombs with SPACE or tap the big button.
+Clear soft walls to open paths and draw enemies into explosions.
+You can walk off your own bomb immediately after placing it. Time your exits!`,
+            },
+          ],
+        },
       ],
     },
     {
