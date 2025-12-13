@@ -330,6 +330,10 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
     window.addEventListener("touchend", onTouchEnd, touchOptions);
     window.addEventListener("touchcancel", onTouchEnd, touchOptions);
 
+    const isPlayerEntity = (ent: Player | Enemy): ent is Player => {
+      return "bombLimit" in ent;
+    };
+
     const isSolid = (x: number, y: number, ent: Player | Enemy) => {
       const c = Math.floor(x / TILE_SIZE);
       const r = Math.floor(y / TILE_SIZE);
@@ -340,10 +344,10 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
           const bombX = bomb.c * TILE_SIZE + TILE_SIZE / 2;
           const bombY = bomb.r * TILE_SIZE + TILE_SIZE / 2;
           const overlapThreshold = TILE_SIZE * 0.8;
-          if (
+          const overlap =
             Math.abs(ent.x - bombX) < overlapThreshold &&
-            Math.abs(ent.y - bombY) < overlapThreshold
-          ) {
+            Math.abs(ent.y - bombY) < overlapThreshold;
+          if (overlap && isPlayerEntity(ent)) {
             return false;
           }
           return true;
