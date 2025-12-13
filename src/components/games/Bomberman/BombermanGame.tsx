@@ -168,7 +168,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
         attempts += 1;
         const r = Math.floor(Math.random() * (ROWS - 2)) + 1;
         const c = Math.floor(Math.random() * (COLS - 2)) + 1;
-        if (grid[r][c] === TYPES.EMPTY && (r > 4 || c > 4)) {
+        if (grid[r]?.[c] === TYPES.EMPTY && (r > 4 || c > 4)) {
           result.push({
             x: c * TILE_SIZE + TILE_SIZE / 2,
             y: r * TILE_SIZE + TILE_SIZE / 2,
@@ -338,7 +338,9 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
       const c = Math.floor(x / TILE_SIZE);
       const r = Math.floor(y / TILE_SIZE);
       if (c < 0 || c >= COLS || r < 0 || r >= ROWS) return true;
-      if (grid[r][c] === TYPES.WALL || grid[r][c] === TYPES.SOFT) return true;
+      const row = grid[r];
+      if (!row) return true;
+      if (row[c] === TYPES.WALL || row[c] === TYPES.SOFT) return true;
       for (const bomb of bombs) {
         if (bomb.c === c && bomb.r === r) {
           const bombX = bomb.c * TILE_SIZE + TILE_SIZE / 2;
@@ -428,7 +430,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
     const explodeBomb = (bomb: Bomb) => {
       triggerShake();
       createFire(bomb.c, bomb.r);
-      const dirs = [
+      const dirs: Array<[number, number]> = [
         [0, -1],
         [0, 1],
         [-1, 0],
@@ -439,11 +441,14 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
           const nc = bomb.c + dc * step;
           const nr = bomb.r + dr * step;
           if (nc < 0 || nc >= COLS || nr < 0 || nr >= ROWS) break;
-          const tile = grid[nr][nc];
+          const row = grid[nr];
+          if (!row) break;
+          const tile = row[nc];
+          if (tile === undefined) break;
           if (tile === TYPES.WALL) break;
           createFire(nc, nr);
           if (tile === TYPES.SOFT) {
-            grid[nr][nc] = TYPES.EMPTY;
+            row[nc] = TYPES.EMPTY;
             break;
           }
         }
@@ -502,6 +507,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
 
       for (let i = bombs.length - 1; i >= 0; i -= 1) {
         const bomb = bombs[i];
+        if (!bomb) continue;
         bomb.timer -= dt;
         if (bomb.timer <= 0) {
           explodeBomb(bomb);
@@ -512,6 +518,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
 
       for (let i = particles.length - 1; i >= 0; i -= 1) {
         const particle = particles[i];
+        if (!particle) continue;
         particle.life -= dt;
         const pX = particle.c * TILE_SIZE + TILE_SIZE / 2;
         const pY = particle.r * TILE_SIZE + TILE_SIZE / 2;
@@ -523,6 +530,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
         }
         for (let j = enemies.length - 1; j >= 0; j -= 1) {
           const enemy = enemies[j];
+          if (!enemy) continue;
           if (
             Math.hypot(enemy.x - pX, enemy.y - pY) <
             enemy.radius + TILE_SIZE / 2 - 4
@@ -544,7 +552,9 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-          const type = grid[r][c];
+        const row = grid[r];
+        if (!row) continue;
+        const type = row[c];
           const x = c * TILE_SIZE;
           const y = r * TILE_SIZE;
           if (type === TYPES.WALL) {
