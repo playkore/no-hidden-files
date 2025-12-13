@@ -19,6 +19,7 @@ interface GameActions {
 
 export default function BombermanGame({ onClose }: BombermanGameProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const gameContainerRef = useRef<HTMLDivElement | null>(null);
   const joystickZoneRef = useRef<HTMLDivElement | null>(null);
   const joystickKnobRef = useRef<HTMLDivElement | null>(null);
   const actionsRef = useRef<GameActions | null>(null);
@@ -28,10 +29,11 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    const gameContainer = gameContainerRef.current;
     const joystickZone = joystickZoneRef.current;
     const joystickKnob = joystickKnobRef.current;
 
-    if (!canvas || !joystickZone || !joystickKnob) {
+    if (!canvas || !joystickZone || !joystickKnob || !gameContainer) {
       return;
     }
 
@@ -394,7 +396,33 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
       particles.push({ c, r, life: 600 });
     };
 
+    const shakeDuration = 300;
+    const shakeMagnitude = 8;
+    let shakeTimeLeft = 0;
+
+    const clearShake = () => {
+      gameContainer.style.transform = "";
+    };
+
+    const triggerShake = () => {
+      shakeTimeLeft = shakeDuration;
+    };
+
+    const updateShake = (dt: number) => {
+      if (shakeTimeLeft > 0) {
+        shakeTimeLeft = Math.max(0, shakeTimeLeft - dt);
+        const progress = shakeTimeLeft / shakeDuration;
+        const magnitude = shakeMagnitude * progress;
+        const offsetX = (Math.random() * 2 - 1) * magnitude;
+        const offsetY = (Math.random() * 2 - 1) * magnitude;
+        gameContainer.style.transform = `translate3d(${offsetX}px, ${offsetY}px, 0)`;
+      } else if (gameContainer.style.transform) {
+        clearShake();
+      }
+    };
+
     const explodeBomb = (bomb: Bomb) => {
+      triggerShake();
       createFire(bomb.c, bomb.r);
       const dirs = [
         [0, -1],
@@ -589,6 +617,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
       lastTime = timestamp;
       update(dt);
       draw();
+      updateShake(dt);
       animationFrame = requestAnimationFrame(gameLoop);
     };
 
@@ -610,6 +639,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
       window.removeEventListener("touchcancel", onTouchEnd, touchOptions);
       cancelAnimationFrame(animationFrame);
       actionsRef.current = null;
+      clearShake();
     };
   }, [setGameState, setIsReady]);
 
@@ -713,7 +743,7 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
           ✕
         </button>
       )}
-      <div className={styles.gameContainer}>
+      <div ref={gameContainerRef} className={styles.gameContainer}>
         <canvas ref={canvasRef} className={styles.canvas} />
         <div className={styles.uiLayer}>{renderMessage()}</div>
       </div>
