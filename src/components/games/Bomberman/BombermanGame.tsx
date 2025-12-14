@@ -302,8 +302,10 @@ export default function BombermanGame({ onClose }: BombermanGameProps) {
       if (touch) moveJoystick(touch.clientX, touch.clientY);
     };
     const onTouchEnd = (event: TouchEvent) => {
-      event.preventDefault();
-      endJoystick();
+      if (isDragging) {
+        event.preventDefault();
+        endJoystick();
+      }
     };
 
     const onMouseDown = (event: MouseEvent) => {
